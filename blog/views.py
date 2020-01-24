@@ -39,7 +39,7 @@ class PostCreateView(TemplateView):
     form = PostForm
     
     def get(self, *args, **kwargs):
-        form = self.form
+        form = self.form()
         context = {'form' : form}
         return render(self.request, self.template_name, context)
 
@@ -85,7 +85,7 @@ class PostEditView(TemplateView):
         context = {
             'form' : form
         }
-        
+
         if form.is_valid():
             post = form.save(commit=False)
             post.author = self.request.user

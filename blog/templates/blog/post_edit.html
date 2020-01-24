@@ -5,11 +5,27 @@
 
     <form method="POST" class="post-form" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
 
-        <button type="submit" class="save btn btn-default">Save</button>
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div class="field-wrapper">
+            <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+
+            {% if field.errors %}
+                <ul class="error-list">
+                {% for error in field.errors %}
+                    <li class="error-message">{{ error|escape }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ field }}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="save btn btn-primary">Save</button>
 
     </form>
 
 {% endblock %}
-
