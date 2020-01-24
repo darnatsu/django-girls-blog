@@ -36,16 +36,17 @@ class PostDetailView(TemplateView):
 class PostCreateView(TemplateView):
 
     template_name = 'blog/post_edit.html'
-
+    form = PostForm
+    
     def get(self, *args, **kwargs):
-        form = PostForm()
-        context = { 'form' : form }
+        form = self.form
+        context = {'form' : form}
         return render(self.request, self.template_name, context)
 
     def post(self, *args, **kwargs):
 
-        form = PostForm(self.request.POST)
-
+        form = self.form(self.request.POST)
+        context = {'form' : form}
         if form.is_valid():
             post = form.save(commit=False)
             post.author = self.request.user
@@ -55,16 +56,12 @@ class PostCreateView(TemplateView):
 
             return redirect('post_detail', post_id=post.pk)
 
-        else:
-
-            form = PostForm()
-
-        return render(self.request, self.template_name, self.context)
-
+        return render(self.request, self.template_name, context)
 
 class PostEditView(TemplateView):
     
     template_name = 'blog/post_edit.html'
+    form = PostForm
 
     def get(self, *args, **kwargs):
 
@@ -79,12 +76,16 @@ class PostEditView(TemplateView):
         return render(self.request, self.template_name, context)
 
     def post(self, *args, **kwargs):
-        
+
         post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id)
 
         form = PostForm(self.request.POST, instance=post)
 
+        context = {
+            'form' : form
+        }
+        
         if form.is_valid():
             post = form.save(commit=False)
             post.author = self.request.user
@@ -92,4 +93,4 @@ class PostEditView(TemplateView):
             post.save()
             return redirect('post_detail', post_id=post.pk)
         
-        return render(self.request, self.template_name, self.context)
+        return render(self.request, self.template_name, context)
